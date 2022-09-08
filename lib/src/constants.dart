@@ -1,0 +1,1 @@
+const defaultConfigName = 'default';
