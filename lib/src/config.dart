@@ -5,17 +5,17 @@ import 'store.dart';
 /// A representation of a configuration that can be identified by an [id].
 ///
 /// This configuration is stored in a [ConfigStore] and can be retrieved by a `name`.
-abstract class Config {
+abstract class Config<T extends Object> {
   const Config();
 
   /// Creates a configuration from a map that can be identified by an [id].
   const factory Config.fromMap(
-    Object id,
+    T id,
     Map<String, dynamic> data,
-  ) = MapConfig;
+  ) = MapConfig<T>;
 
   /// The unique identifier of this [Config].
-  Object get id;
+  T get id;
 
   @override
   int get hashCode => id.hashCode;
@@ -35,7 +35,7 @@ abstract class Config {
     String name = 'default',
     required Config config,
   }) {
-    return manager.putImmediately(
+    return manager.setImmediately(
       name: name,
       config: config,
     );
@@ -48,20 +48,20 @@ abstract class Config {
     String name = 'default',
     required ConfigCreationCallback create,
   }) {
-    return manager.put(
+    return manager.set(
       name: name,
       create: create,
     );
   }
 
-  /// {@macro ConfigStore.putIfAbsent}
+  /// {@macro ConfigStore.setIfAbsent}
   ///
   /// {@macro ConfigsManager.put}
-  static void putIfAbsent({
+  static void setIfAbsent({
     String name = 'default',
     required ConfigCreationCallback create,
   }) {
-    return manager.putIfAbsent(
+    return manager.setIfAbsent(
       name: name,
       create: create,
     );
@@ -84,11 +84,80 @@ abstract class Config {
     return manager.isA(id, name);
   }
 
+  /// Returns a [ConfigProvider] which manages the [Config] only under one [name] and
+  /// optionally by type of Config [T] & id of config [O].
+  static ConfigProvider<O, T> by<O extends Object, T extends Config<O>>(
+    String name, [
+    ConfigsManager? manager,
+  ]) {
+    return ConfigProvider<O, T>(
+      name,
+      manager ?? Config.manager,
+    );
+  }
+
   void dispose() {}
 }
 
+/// A [ConfigProvider] which manages [Config] only under one [name] and
+/// optionally by type of Config [T] & id of config [O].
+///
+/// This is a convenience class to make it easier to manage [Config]s and does not
+/// enforce type on a stored config by the [name].
+class ConfigProvider<O extends Object, T extends Config<O>> {
+  /// The name for storing a [Config].
+  final String name;
+
+  /// All configs are managed by a [ConfigsManager]. It uses a [ConfigStore] to store and retrieve configs by a name.
+  final ConfigsManager manager;
+
+  const ConfigProvider(
+    this.name,
+    this.manager,
+  );
+
+  /// {@macro ConfigStore.get}
+  T get() {
+    final data = manager.get(name);
+    assert(
+      data is T,
+      'Config with name "$name" is not of type $T but of type ${data.runtimeType}',
+    );
+    return data as T;
+  }
+
+  /// {@macro ConfigStore.addLazy}
+  void set(ConfigCreationCallback<T> create) {
+    return manager.set(
+      name: name,
+      create: create,
+    );
+  }
+
+  /// {@macro ConfigStore.setIfAbsent}
+  void setIfAbsent(ConfigCreationCallback<T> create) {
+    return manager.setIfAbsent(
+      name: name,
+      create: create,
+    );
+  }
+
+  /// {@macro ConfigStore.add}
+  T setImmediately(T value) {
+    return manager.setImmediately(
+      name: name,
+      config: value,
+    ) as T;
+  }
+
+  /// {@macro ConfigsManager.isA}
+  bool isA(O id) {
+    return manager.isA(id, name);
+  }
+}
+
 /// A configuration that that has data as a [Map].
-class MapConfig<O extends Object> extends Config {
+class MapConfig<O extends Object> extends Config<O> {
   @override
   final O id;
   final Map<String, dynamic> data;

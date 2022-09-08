@@ -1,4 +1,4 @@
 import 'config.dart';
 
-typedef ConfigCreationCallback = Config Function();
+typedef ConfigCreationCallback<T extends Config> = T Function();
 typedef ReturnDefaultValueCallback<T> = T? Function();

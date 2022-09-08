@@ -18,7 +18,7 @@ class ConfigStore {
     if (o != null) return o;
     final f = _configCreationCallbacks[name];
     if (f == null) return null;
-    final d = add(name, f());
+    final d = set(name, f());
     _configCreationCallbacks.remove(name);
     return d;
   }
@@ -26,25 +26,25 @@ class ConfigStore {
   /// {@template ConfigStore.add}
   /// Immediately adds a [config] to the store by its [name].
   ///
-  /// This will override any existing config with the same name. To only put if absent, use `putIfAbsent`.
+  /// This will override any existing config with the same name. To only put if absent, use `setIfAbsent`.
   /// {@endtemplate}
-  Config add(String name, Config config) {
+  Config set(String name, Config config) {
     return configs[name] = config;
   }
 
   /// {@template ConfigStore.addLazy}
   /// Lazily adds a [Config] to the store by its [name]. The config will be created when it is first requested by the [get] method.
   ///
-  /// This will override any existing config with the same name. To only put if absent, use `putIfAbsent`.
+  /// This will override any existing config with the same name. To only put if absent, use `setIfAbsent`.
   /// {@endtemplate}
-  void addLazy(String name, ConfigCreationCallback create) {
+  void setLazy(String name, ConfigCreationCallback create) {
     _configCreationCallbacks[name] = create;
   }
 
-  /// {@template ConfigStore.putIfAbsent}
+  /// {@template ConfigStore.setIfAbsent}
   /// Adds a [Config] to the store by its [name] if it does not already exist.
   /// {@endtemplate}
-  void putIfAbsent(
+  void setIfAbsent(
     String name,
     ConfigCreationCallback create,
   ) {
@@ -52,7 +52,7 @@ class ConfigStore {
         _configCreationCallbacks.containsKey(name)) {
       return;
     }
-    addLazy(name, create);
+    setLazy(name, create);
   }
 
   /// Remove a [Config] by its name from this store.

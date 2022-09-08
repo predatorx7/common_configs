@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:common_configs/common_configs.dart';
 
 /// Create your own config by extending [Config].
@@ -50,4 +52,16 @@ void main() {
   print('is good: ${Config.isA(AwesomeType.good, someOtherScopeName)}');
   print('is better: ${Config.isA(AwesomeType.better, someOtherScopeName)}');
   print('is best: ${Config.isA(AwesomeType.best, someOtherScopeName)}');
+
+  /// If you want a more convenient way to manage config only by a name try using [Config.by].
+  final useItLikeConfig = Config.by(someOtherScopeName);
+
+  useItLikeConfig.get();
+  useItLikeConfig.set(createMapConfig);
+  useItLikeConfig.setIfAbsent(createMapConfig);
+  useItLikeConfig.isA(AwesomeType.best);
+  useItLikeConfig.setImmediately(createMapConfig());
+
+  /// You can optionally provide types to it.
+  Config.by<AwesomeType, AwesomeMapConfig>(someOtherScopeName);
 }

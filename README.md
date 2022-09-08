@@ -38,7 +38,7 @@ enum ConfigType {
 }
 ```
 
-We'll use a pre-existing MapConfig which can use `Map<String, dynamic>` as a
+We'll use a pre-existing MapConfig which uses `Map<String, dynamic>` as a
 Config with an identifier.
 
 ```dart

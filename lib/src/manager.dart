@@ -7,7 +7,7 @@ abstract class ConfigsManager {
   const ConfigsManager();
 
   /// {@macro ConfigStore.add}
-  Config putImmediately({
+  Config setImmediately({
     String name = defaultConfigName,
     required Config config,
   });
@@ -17,15 +17,15 @@ abstract class ConfigsManager {
   /// {@template ConfigsManager.put}
   /// By default, config is stored under the [name] `default`.
   /// {@endtemplate}
-  void put({
+  void set({
     String name = defaultConfigName,
     required ConfigCreationCallback create,
   });
 
-  /// {@macro ConfigStore.putIfAbsent}
+  /// {@macro ConfigStore.setIfAbsent}
   ///
   /// {@macro ConfigsManager.put}
-  void putIfAbsent({
+  void setIfAbsent({
     String name = defaultConfigName,
     required ConfigCreationCallback create,
   });
@@ -58,28 +58,28 @@ class InMemoryConfigsManager extends ConfigsManager {
   ConfigStore store = ConfigStore();
 
   @override
-  Config putImmediately({
+  Config setImmediately({
     String name = defaultConfigName,
     required Config config,
   }) {
-    store.add(name, config);
+    store.set(name, config);
     return config;
   }
 
   @override
-  void put({
+  void set({
     String name = defaultConfigName,
     required ConfigCreationCallback create,
   }) {
-    return store.addLazy(name, create);
+    return store.setLazy(name, create);
   }
 
   @override
-  void putIfAbsent({
+  void setIfAbsent({
     String name = defaultConfigName,
     required ConfigCreationCallback create,
   }) {
-    return store.putIfAbsent(name, create);
+    return store.setIfAbsent(name, create);
   }
 
   @override
